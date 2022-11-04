@@ -17,6 +17,7 @@ import com.pessetto.origamismtp.status.AuthStatus;
 public class ConnectionHandler implements Runnable {
 
 	private Socket connectionSocket;
+	private String tlsVersion = null;
 	
 	/** Creates new instance of the ConnectionHandler on socket
 	 * @param connectionSocket The socket to use
@@ -77,7 +78,7 @@ public class ConnectionHandler implements Runnable {
 				}
 				else if(cmdId.equals("starttls"))
 				{
-					connectionSocket = commandHandler.handleSTARTTLS(connectionSocket);
+					connectionSocket = commandHandler.handleSTARTTLS(connectionSocket, tlsVersion);
 					outToClient = new DataOutputStream(connectionSocket.getOutputStream());
 					inFromClient = new Scanner(connectionSocket.getInputStream());
 					commandHandler.setInAndOutFromClient(inFromClient, outToClient);
@@ -106,6 +107,14 @@ public class ConnectionHandler implements Runnable {
 			ex.printStackTrace(System.err);
 		}
 		
+	}
+
+	/** Configures a specific TLS version that will be used
+	 * @param tlsVersion version as string (only numbers, dot-separated)
+	 */
+	public void configureTLS(String tlsVersion)
+	{
+		this.tlsVersion = tlsVersion;
 	}
 	
 	/** Gets the full command

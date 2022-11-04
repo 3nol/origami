@@ -1,5 +1,6 @@
 package com.pessetto.origamismtp;
 
+import com.pessetto.origamismtp.constants.Constants;
 import com.pessetto.origamismtp.filehandlers.inbox.Inbox;
 import java.net.*;
 import java.util.ArrayList;
@@ -79,6 +80,15 @@ public class OrigamiSMTP implements Callable<Integer>{
 	 */
 	public void startSMTP() throws BindException
 	{
+		startSMTP(null);
+	}
+
+	/** Starts the SMTP server with a TLS version to configure
+	 * @param tlsVersion version as string (only numbers, dot-separated)
+	 * @throws BindException
+	 */
+	public void startSMTP(String tlsVersion) throws BindException
+	{
 		try
 		{
 			ExecutorService threadPool = Executors.newWorkStealingPool();
@@ -97,6 +107,9 @@ public class OrigamiSMTP implements Callable<Integer>{
 				System.out.println("AWAIT CONNECTION");
 				Socket connectionSocket = smtpSocket.accept();
 				ConnectionHandler connectionHandler = new ConnectionHandler(connectionSocket);
+				if (tlsVersion != null) {
+					connectionHandler.configureTLS(tlsVersion);
+				}
 				threadPool.submit(connectionHandler);
 				System.out.println("Connection sent to thread");
 			}
@@ -149,7 +162,27 @@ public class OrigamiSMTP implements Callable<Integer>{
 
 	public static void main(String[] args) throws BindException
 	{
+		// simple args parser to find whether and what TLS version was specified
+		String tlsVersion = null;
+		var foundTls = false;
+
+		for (String arg : args) {
+			if (arg != null) {
+				arg = arg.toLowerCase();
+				if (foundTls) {
+					var t = arg.split("v", 2);
+					tlsVersion = t[t.length - 1];
+				}
+				if (arg.contains("starttls")) {
+					Constants.ENABLE_START_TLS = true;
+				} else if (arg.contains("tls")) {
+					foundTls = true;
+				}
+			}
+		}
+
+		// start SMTP server and optionally configure TLS
 		OrigamiSMTP server = new OrigamiSMTP();
-		server.startSMTP();
+		server.startSMTP(tlsVersion);
 	}
 }

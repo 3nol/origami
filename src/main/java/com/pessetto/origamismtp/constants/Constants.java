@@ -8,8 +8,8 @@ public class Constants {
 	public final static char LF = (char)0x0A;
 	/** Constant for Carriage return line feed */
 	public final static String CRLF = "" + CR + LF;
-	/** Constant to enable SSL */
-	public final static boolean ENABLE_START_TLS = true;
+	/** NON-FINAL Constant to enable STARTTLS - I know it's dirty */
+	public static boolean ENABLE_START_TLS = false;
 	/** Constant for the log folder */
 	public final static String LOG_FOLDER = System.getProperty("user.dir")+"/logs/";
 	/** Constant for the inbox folder*/

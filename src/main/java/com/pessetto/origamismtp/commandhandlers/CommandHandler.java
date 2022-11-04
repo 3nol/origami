@@ -116,14 +116,17 @@ public class CommandHandler
 	 * @return The new encrypted socket
 	 * @throws IOException Input or Output failed
 	 */
-	public SSLSocket handleSTARTTLS(Socket old) throws IOException
+	public Socket handleSTARTTLS(Socket old, String tlsVersion) throws IOException
 	{
-		tls = new STARTTLSHandler(old);
+		tls = new STARTTLSHandler(old, tlsVersion);
 		handleResponse(tls.getResponse());
-		SSLSocket ssocket = tls.enableTLS(old);
-		System.out.println("Secure socket setup");
-		secure = true;
-		return ssocket;
+		SSLSocket ssocket = null;
+		if (Constants.ENABLE_START_TLS) {
+			ssocket = tls.enableTLS(old);
+			System.out.println("Secure socket setup");
+			secure = true;
+		}
+		return ssocket != null ? ssocket : old;
 	}
 	
 	/** Handles the QUIT command

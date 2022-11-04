@@ -34,8 +34,9 @@ public class STARTTLSHandler
 	
 	/** Creates a new instance of the STARTTLSHandler
 	 * @param old The socket that is currently in use (not encrypted)
+	 * @param tlsVersion The tls version used for STARTTLS
 	 */
-	public STARTTLSHandler(Socket old)
+	public STARTTLSHandler(Socket old, String tlsVersion)
 	{
 		try
 		{
@@ -56,7 +57,7 @@ public class STARTTLSHandler
 			trustFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 			trustFactory.init(trustStore);
 			
-			sslContext = SSLContext.getInstance("TLSv1.2");
+			sslContext = SSLContext.getInstance("TLSv" + tlsVersion);
 			sslContext.init(keyManagerFactory.getKeyManagers(),trustFactory.getTrustManagers(), null);
 			if(old instanceof SSLSocket)
 			{
@@ -110,7 +111,7 @@ public class STARTTLSHandler
 					}
 					else
 					{
-						System.out.println("Certifcate appears to have valid date");
+						System.out.println("Certificate appears to have valid date");
 					}
 				}
 			}
